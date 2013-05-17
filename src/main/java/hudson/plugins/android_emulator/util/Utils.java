@@ -13,9 +13,8 @@ import hudson.model.AbstractBuild;
 import hudson.model.Computer;
 import hudson.model.Hudson;
 import hudson.model.Node;
-import hudson.plugins.android_emulator.AndroidEmulator.DescriptorImpl;
 import hudson.plugins.android_emulator.Constants;
-import hudson.plugins.android_emulator.Messages;
+import hudson.plugins.android_emulator.AndroidEmulator.DescriptorImpl;
 import hudson.plugins.android_emulator.sdk.AndroidSdk;
 import hudson.plugins.android_emulator.sdk.Tool;
 import hudson.remoting.Callable;
@@ -323,10 +322,13 @@ public class Utils {
 
     private static boolean isSdkToolsDirectory(Tool[] tools, File toolsDir, boolean isUnix) {
         int toolCount = 0;
-        if (toolsDir.isDirectory()) {
+        File platformToolsDir = new File(toolsDir.getParent(), "platform-tools");
+        if (toolsDir.isDirectory() && platformToolsDir.isDirectory()) {
             for (Tool tool : tools) {
                 String executable = tool.getExecutable(isUnix);
-                if (new File(toolsDir, executable).exists()) {
+                File parentDir = tool.isPlatformTool() ? platformToolsDir
+                        : toolsDir;
+                if (new File(parentDir, executable).exists()) {
                     toolCount++;
                 }
             }
